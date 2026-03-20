@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Til min yndlingsperson</title>
+    <!-- Henter konfetti-biblioteket -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #ffe6e6; /* Lyserød baggrund */
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,85 +18,132 @@
             text-align: center;
         }
         .container {
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 450px;
             width: 90%;
+            transition: all 0.5s ease;
         }
         input[type="text"] {
-            padding: 10px;
+            padding: 12px;
             width: 80%;
             margin: 20px 0;
             border: 2px solid #ffb3b3;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
             text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #ff4d4d;
         }
         button {
             background-color: #ff4d4d;
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 5px;
+            padding: 12px 30px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            transition: transform 0.2s, background-color 0.3s;
         }
         button:hover {
             background-color: #ff1a1a;
+            transform: scale(1.05);
         }
         #message {
-            display: none; /* Skjult indtil gåden er løst */
-            color: #e60000;
+            display: none;
+        }
+        #typewriter-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            min-height: 100px; /* Holder pladsen mens der skrives */
         }
         .error {
-            color: red;
+            color: #e60000;
             font-size: 14px;
             display: none;
             margin-top: 15px;
+            animation: shake 0.5s;
+        }
+        /* En lille ryste-animation hvis hun svarer forkert */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Gåde-boksen -->
     <div class="container" id="riddle-box">
-        <h1>Hej Babe❤️</h1>
+        <h1>Hej Babe</h1>
         <h2>Jeg har en lille gåde til dig... 🤔</h2>
         <p>Hvad slår cirka 100.000 gange i døgnet, men slår kun for dig?</p>
-        <input type="text" id="answer" placeholder="Skriv dit svar her...">
+        <input type="text" id="answer" placeholder="Skriv dit svar her..." autocomplete="off">
         <br>
         <button onclick="checkAnswer()">Svar</button>
-        <p class="error" id="error-msg">Forkert svar... Prøv igen, babe! ❤️</p>
+        <p class="error" id="error-msg">Hmm, det var ikke helt rigtigt. Prøv igen, skat! ❤️</p>
     </div>
 
-    <!-- Kærlighedsbeskeden (vises når gåden er løst) -->
     <div class="container" id="message">
-        <h1>Rigtigt! 🎉</h1>
+        <h1>Det er rigtigt, hvor er du god! 🎉</h1>
         <h2>Det er nemlig mit hjerte! ❤️</h2>
-        <p>Jeg har lavet denne lille side for at fortælle dig, at du er det bedste i mit liv, og jeg elsker dig utrolig meget.</p>
-        <p>Velkommen hjem! 🥰</p>
+        <p id="typewriter-text"></p>
     </div>
 
     <script>
+        // Kærlighedsbeskeden der skal skrives ud
+        const loveMessage = "Jeg har lavet denne lille side for at fortælle dig, hvor skøn en person du er, og at jeg elsker dig utrolig meget. Velkommen hjem! 🥰. Giv din Basse et kys❤️";
+        let i = 0;
+
+        // Skrivemaskine-funktion
+        function typeWriter() {
+            if (i < loveMessage.length) {
+                document.getElementById("typewriter-text").innerHTML += loveMessage.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50); // Hastigheden på tastatur-effekten
+            }
+        }
+
+        // Tjek svaret
         function checkAnswer() {
-            // Hent svaret og gør det til små bogstaver, så vi undgår fejl med stort/småt
             const answer = document.getElementById('answer').value.toLowerCase().trim();
+            const errorMsg = document.getElementById('error-msg');
             
-            // Hvis svaret indeholder ordet "hjerte"
+            // Vi accepterer svar der indeholder "hjerte"
             if (answer.includes('hjerte')) {
                 // Skjul gåden og vis beskeden
                 document.getElementById('riddle-box').style.display = 'none';
                 document.getElementById('message').style.display = 'block';
+                
+                // Skyd konfetti af!
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#ff4d4d', '#ffb3b3', '#ffffff']
+                });
+
+                // Start skrivemaskine-effekten
+                setTimeout(typeWriter, 500);
             } else {
-                // Vis fejlbesked
-                document.getElementById('error-msg').style.display = 'block';
+                // Vis ryste-effekt og fejlbesked
+                errorMsg.style.display = 'block';
+                // Genstart animationen så den ryster hver gang man gætter forkert
+                errorMsg.style.animation = 'none';
+                setTimeout(() => errorMsg.style.animation = 'shake 0.5s', 10);
             }
         }
 
-        // Gør at man også bare kan trykke "Enter" for at svare
+        // Gør at man kan trykke "Enter"
         document.getElementById('answer').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 checkAnswer();
