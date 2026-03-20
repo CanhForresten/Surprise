@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Til min yndlingsperson</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffe6e6; /* Lyserød baggrund */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin: 20px 0;
+            border: 2px solid #ffb3b3;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+        button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #ff1a1a;
+        }
+        #message {
+            display: none; /* Skjult indtil gåden er løst */
+            color: #e60000;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            display: none;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Gåde-boksen -->
+    <div class="container" id="riddle-box">
+        <h1>Hej Babe❤️</h1>
+        <h2>Jeg har en lille gåde til dig... 🤔</h2>
+        <p>Hvad slår cirka 100.000 gange i døgnet, men slår kun for dig?</p>
+        <input type="text" id="answer" placeholder="Skriv dit svar her...">
+        <br>
+        <button onclick="checkAnswer()">Svar</button>
+        <p class="error" id="error-msg">Forkert svar... Prøv igen, babe! ❤️</p>
+    </div>
+
+    <!-- Kærlighedsbeskeden (vises når gåden er løst) -->
+    <div class="container" id="message">
+        <h1>Rigtigt! 🎉</h1>
+        <h2>Det er nemlig mit hjerte! ❤️</h2>
+        <p>Jeg har lavet denne lille side for at fortælle dig, at du er det bedste i mit liv, og jeg elsker dig utrolig meget.</p>
+        <p>Velkommen hjem! 🥰</p>
+    </div>
+
+    <script>
+        function checkAnswer() {
+            // Hent svaret og gør det til små bogstaver, så vi undgår fejl med stort/småt
+            const answer = document.getElementById('answer').value.toLowerCase().trim();
+            
+            // Hvis svaret indeholder ordet "hjerte"
+            if (answer.includes('hjerte')) {
+                // Skjul gåden og vis beskeden
+                document.getElementById('riddle-box').style.display = 'none';
+                document.getElementById('message').style.display = 'block';
+            } else {
+                // Vis fejlbesked
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+
+        // Gør at man også bare kan trykke "Enter" for at svare
+        document.getElementById('answer').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
