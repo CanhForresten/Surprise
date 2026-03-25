@@ -3,152 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Til min yndlingsperson</title>
-    <!-- Henter konfetti-biblioteket -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <title>Hvad skal vi spise i dag? 🍽️</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            background-color: #f0f4f8;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* Brug min-height for bedre mobil visning */
             margin: 0;
+            overflow: hidden; /* Bevarer drille-effekten for nej-knappen */
             text-align: center;
         }
+
         .container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 40px;
-            border-radius: 20px;
+            background: white;
+            padding: 20px; /* Lidt mindre padding for at give plads til billedet */
+            border-radius: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 450px;
-            width: 90%;
-            transition: all 0.5s ease;
+            max-width: 500px; /* Lidt bredere container */
+            width: 95%; /* Fylder mere på mobilen */
+            box-sizing: border-box;
         }
-        input[type="text"] {
-            padding: 12px;
-            width: 80%;
-            margin: 20px 0;
-            border: 2px solid #ffb3b3;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-            outline: none;
-            transition: border-color 0.3s;
+
+        /* DETTE ER REGLERNE FOR AT GØRE BILLEDET STØRRE */
+        .hoved-billede {
+            width: 100%; /* Fylder hele containerens bredde */
+            max-height: 300px; /* Sætter en max højde, så det ikke fylder HELE skærmen */
+            border-radius: 15px;
+            margin-bottom: 15px;
+            content:center;
+            object-fit: cover; /* Sikrer billedet ikke bliver strakt, men beskåret pænt hvis nødvendigt */
+            display: block; /* Fjerner uønsket mellemrum i bunden */
         }
-        input[type="text"]:focus {
-            border-color: #ff4d4d;
+
+        h1 {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
         }
-        button {
-            background-color: #ff4d4d;
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .option-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            border: 2px solid #ecf0f1;
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .option-card:hover {
+            border-color: #3498db;
+            background-color: #f7fbff;
+            transform: translateY(-3px);
+        }
+
+        .option-card span {
+            font-size: 2rem;
+        }
+
+        .option-card h3 {
+            margin: 10px 0 5px 0;
+            font-size: 1.1rem;
+            color: #2980b9;
+        }
+
+        .option-card small {
+            display: block;
+            color: #7f8c8d;
+        }
+
+        .no-thanks {
+            margin-top: 15px;
+            padding-bottom: 10px;
+        }
+
+        #noBtn {
+            background-color: #bdc3c7;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.3s;
+            font-size: 0.8rem;
+            transition: none; /* Vigtigt for drille-effekten */
         }
-        button:hover {
-            background-color: #ff1a1a;
-            transform: scale(1.05);
+
+        .hidden {
+            display: none !important;
         }
-        #message {
-            display: none;
+
+        #success-message h1 {
+            color: #27ae60;
         }
-        #typewriter-text {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #333;
-            min-height: 100px; /* Holder pladsen mens der skrives */
+        
+        /* Justering for succes-billedet */
+        #success-message .hoved-billede {
+            max-height: 250px; /* Lidt mindre på succes-skærmen */
         }
-        .error {
-            color: #e60000;
-            font-size: 14px;
-            display: none;
-            margin-top: 15px;
-            animation: shake 0.5s;
-        }
-        /* En lille ryste-animation hvis hun svarer forkert */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
+
     </style>
 </head>
 <body>
 
-    <div class="container" id="riddle-box">
-        <h1>Hej Babe</h1>
-        <h2>Jeg har en lille gåde til dig... 🤔</h2>
-        <p>Hvad slår cirka 100.000 gange i døgnet, men slår kun for dig?</p>
-        <input type="text" id="answer" placeholder="Skriv dit svar her..." autocomplete="off">
-        <br>
-        <button onclick="checkAnswer()">Svar</button>
-        <p class="error" id="error-msg">Hmm, det var ikke helt rigtigt. Prøv igen, skat! ❤️</p>
-    </div>
+    <div class="container">
+        <div id="quiz-box">
+            <img src="att.gfavmEcbTEj7jTyN4WViDhFU69BLGges7ucj_K_g8l4 2.jpg" alt="Vores hyggelige valg" class="hoved-billede">
+            
+            <h1>Hvad har du lyst til i dag? ❤️</h1>
+            <p>Jeg vil bare gerne bruge aftenen med dig i dag.</p>
+            <h4>Tag screenshot og send hvad du har valgt</h4>
+            
+            <div class="option-container">
+                <div class="option-card" onclick="selectOption('Bones')">
+                    <span>🍖</span>
+                    <h3>Ude på Bone's eller noget helt andet</h3>
+                    <small>mad & hygge</small>
+                </div>
+                <div class="option-card" onclick="selectOption('Hjemme')">
+                    <span>🏠</span>
+                    <h3>Hjemmehygge</h3>
+                    <small>Vi finder på noget fra køleren</small>
+                </div>
+            </div>
 
-    <div class="container" id="message">
-        <h1>Det er rigtigt, hvor er du god! 🎉</h1>
-        <h2>Det er nemlig mit hjerte! ❤️</h2>
-        <p id="typewriter-text"></p>
+            <div class="no-thanks">
+                <button id="noBtn">Ingen af delene.. 🙄</button>
+            </div>
+        </div>
+
+        <div id="success-message" class="hidden">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2ZicWp6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/lTQF0ODLLJHzaOBCfy/giphy.gif" alt="Fejring" class="hoved-billede">
+            <h1 id="chosen-text">Perfekt valg!</h1>
+            <p id="details-text">Det glæder jeg mig rigtig meget til hvad du har valgt</p>
+            <p><strong>Vi ses senere 😍</strong></p>
+        </div>
     </div>
 
     <script>
-        // Kærlighedsbeskeden der skal skrives ud
-        const loveMessage = "Jeg har lavet denne lille side for at fortælle dig, hvor skøn en person du er, og at jeg elsker dig utrolig meget. Velkommen hjem! 🥰. Giv din Basse et kys❤️";
-        let i = 0;
+        const noBtn = document.getElementById('noBtn');
+        const quizBox = document.getElementById('quiz-box');
+        const successMessage = document.getElementById('success-message');
+        const chosenText = document.getElementById('chosen-text');
+        const detailsText = document.getElementById('details-text');
 
-        // Skrivemaskine-funktion
-        function typeWriter() {
-            if (i < loveMessage.length) {
-                document.getElementById("typewriter-text").innerHTML += loveMessage.charAt(i);
-                i++;
-                setTimeout(typeWriter, 50); // Hastigheden på tastatur-effekten
-            }
-        }
+        function selectOption(choice) {
+            quizBox.classList.add('hidden');
+            successMessage.classList.remove('hidden');
 
-        // Tjek svaret
-        function checkAnswer() {
-            const answer = document.getElementById('answer').value.toLowerCase().trim();
-            const errorMsg = document.getElementById('error-msg');
-            
-            // Vi accepterer svar der indeholder "hjerte"
-            if (answer.includes('hjerte')) {
-                // Skjul gåden og vis beskeden
-                document.getElementById('riddle-box').style.display = 'none';
-                document.getElementById('message').style.display = 'block';
-                
-                // Skyd konfetti af!
-                confetti({
-                    particleCount: 150,
-                    spread: 80,
-                    origin: { y: 0.6 },
-                    colors: ['#ff4d4d', '#ffb3b3', '#ffffff']
-                });
-
-                // Start skrivemaskine-effekten
-                setTimeout(typeWriter, 500);
+            if (choice === 'Bones') {
+                chosenText.innerText = "Bone's it is! 🍖";
+                detailsText.innerText = "Jeg bestiller et bord til os.";
             } else {
-                // Vis ryste-effekt og fejlbesked
-                errorMsg.style.display = 'block';
-                // Genstart animationen så den ryster hver gang man gætter forkert
-                errorMsg.style.animation = 'none';
-                setTimeout(() => errorMsg.style.animation = 'shake 0.5s', 10);
+                chosenText.innerText = "Hjemmehygge! 🏠";
+                detailsText.innerText = "Lad os finde på noget mad sammen";
             }
         }
 
-        // Gør at man kan trykke "Enter"
-        document.getElementById('answer').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkAnswer();
-            }
+        // Drille-funktion til Nej-knappen (flytter den fixed)
+        function moveButton() {
+            // Margin sikrer den ikke ryger helt ud af skærmen
+            const margin = 50;
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - margin * 2) + margin;
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - margin * 2) + margin;
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+            noBtn.style.zIndex = '1000'; // Sikrer den er øverst
+        }
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Forhindrer normalt klik på mobil
+            moveButton();
         });
     </script>
+
 </body>
 </html>
